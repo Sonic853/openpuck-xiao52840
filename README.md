@@ -91,6 +91,12 @@ The easiest way to install is to grab a uf2 file from the GitHub releases and dr
 
 See [build instructions document](./docs/BUILD_AND_DEPLOY.md) for  details on how to flash the MCU during development.
 
+**DX Xiao nRF52840 / Xiao SuperMini:** boards with the factory S140 7.3.0
+bootloader need the [Xiao-specific build](./docs/XIAO_NRF52840.md).
+Use `OpenPuck-xiao-s140-7.3.0.uf2`, not the standard Pro Micro UF2:
+their application start addresses differ. This target has passed compilation
+and image-layout checks; physical USB/RF validation is still pending.
+
 # Pairing
 Both OpenPuck and the controller need to be hooked up to the same machine with a data capable USB C cable at the same time and Steam must be running. Steam should in most cases automatically pop up a menu to pair the controller. If not, you can go to Settings -> Controllers and press "Add Controller".
 

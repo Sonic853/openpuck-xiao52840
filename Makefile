@@ -62,7 +62,7 @@ UF2_OUTPUT_DIR ?= build/openpuck
 # (No auto-detect -- uploading to a guessed serial port risks writing to the wrong device. List with
 # `arduino-cli board list`.) FLASH_PORT = whatever goal isn't one of our real targets; the catch-all rule at
 # the bottom swallows it so make doesn't try to build the port path as a target.
-FLASH_PORT := $(filter-out format format-check check build build-raytac \
+FLASH_PORT := $(filter-out format format-check check build build-raytac build-xiao \
 	package-raytac flash-raytac deploy-raytac provision-raytac-softdevice \
 	build-recovery reversepuck reversepuck-flash reversepuck-deploy flash deploy,$(MAKECMDGOALS))
 UPLOAD = arduino-cli upload -b $(FQBN) -p "$(FLASH_PORT)" OpenPuck

@@ -13,8 +13,9 @@ UF2 block addresses alone cannot relocate an already linked application.
 Install Arduino CLI and the pinned dependencies:
 
 ```sh
-arduino-cli core install Seeeduino:nrf52@1.1.13 --additional-urls https://files.seeedstudio.com/arduino/package_seeeduino_boards_index.json
-arduino-cli lib install "Adafruit TinyUSB Library@3.6.0" --no-deps
+python -m pip install adafruit-nrfutil
+python tools/build-xiao.py --install-deps
+# Subsequent builds:
 python tools/build-xiao.py
 ```
 
@@ -23,8 +24,15 @@ non-default TinyUSB library location. The script uses the Seeed Xiao
 variant, S140 7.3.0 API and v7 linker script, and TinyUSB 3.6.0 (the version
 used by Adafruit nRF52 core 1.7.0) instead of Seeed's bundled 1.7.0.
 It supplies OpenPuck's USB flags
-and linker wrappers, generates the ignored version header, and checks
+and linker wrappers, temporarily generates the ignored version header, and checks
 the output's block addresses and vector table.
+
+The Xiao sketchbook and TinyUSB library live under `build/xiao-arduino`,
+so they do not override the USB library used by standard or Raytac builds.
+The existing version header is restored even if compilation fails.
+`OPK_BUILD_VERSION` is honored for CI/release builds; otherwise an exact
+version tag is used when present. The installed Seeed core is shared through
+Arduino's normal package directory.
 
 Output: `build/xiao/OpenPuck-xiao-s140-7.3.0.uf2`.
 Double-tap reset and copy this file onto the board's UF2 drive.

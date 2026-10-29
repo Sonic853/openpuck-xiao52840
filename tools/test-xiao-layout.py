@@ -27,6 +27,24 @@ def block(address=0x27000, stack=0x20040000, reset=0x27021):
 
 
 class XiaoLayoutTest(unittest.TestCase):
+    def test_version_header_restored_on_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory) / "git_version.h"
+            previous = b'#define OPK_BUILD_VERSION "release"\r\n'
+            path.write_bytes(previous)
+            with self.assertRaises(RuntimeError):
+                with build.version_header(path, "temporary"):
+                    self.assertEqual(path.read_text(), "temporary")
+                    raise RuntimeError("compile failed")
+            self.assertEqual(path.read_bytes(), previous)
+
+    def test_temporary_version_header_removed(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = pathlib.Path(directory) / "git_version.h"
+            with build.version_header(path, "temporary"):
+                self.assertTrue(path.exists())
+            self.assertFalse(path.exists())
+
     def verify(self, data):
         with tempfile.TemporaryDirectory() as directory:
             path = pathlib.Path(directory) / "firmware.uf2"
