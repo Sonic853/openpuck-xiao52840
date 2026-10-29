@@ -109,6 +109,12 @@ requirements, not just include a license notice. See
 [../OpenPuck/src/libxsm3/LICENSE.txt](../OpenPuck/src/libxsm3/LICENSE.txt), and
 [XBOX360.md](XBOX360.md#licensing-and-redistribution).
 
+### Xiao nRF52840 / DX Xiao SuperMini
+
+For the factory S140 7.3.0 bootloader, use the
+[Xiao-specific build](XIAO_NRF52840.md). The standard release UF2 starts
+at the wrong address for this board.
+
 ### 4a. Raytac MDBT50Q-CX-40
 
 Retail listings may shorten MDBT50Q-CX-40 to `MDBT50Q-CX`. This target is only

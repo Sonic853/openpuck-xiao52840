@@ -1,5 +1,16 @@
 #include "status_led.h"
 #include <Arduino.h>
+#include "board_config.h"
+
+#if defined(OPK_BOARD_XIAO_NRF52840)
+// D24 is the Xiao's QSPI clock, not the Pro Micro clone's second LED.
+#undef WAKE_LED_PIN_A
+#undef WAKE_LED_PIN_B
+#undef WAKE_LED_ON
+#define WAKE_LED_PIN_A LED_BLUE
+#define WAKE_LED_PIN_B LED_BLUE
+#define WAKE_LED_ON LOW
+#endif
 
 #if defined(OPK_BOARD_MDBT50Q_CX_40)
 #include <nrf_gpio.h>

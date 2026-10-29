@@ -75,6 +75,8 @@ static bool boardCommand(uint8_t op)
 		g_blobRequest = true;
 		return true;
 	}
+#endif
+#if !OPK_HAS_STAGED_UPDATE
 	if (op >= 0x20 && op <= 0x24) {
 		fwupAckPost(FWUP_ERR_STATE);
 		return true;

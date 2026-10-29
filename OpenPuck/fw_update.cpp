@@ -2,16 +2,17 @@
 // meta-page commit arms it; the next boot applies it from RAM. See fw_update.h for the protocol and the
 // corruption-safety invariant every step here preserves.
 #include "fw_update.h"
+#include "board_config.h"
 #include "rf_journal_layout.h"
 #include "fault_diag.h"
 #include <Arduino.h>
 #include <string.h>
 
-// nRF52840 flash map (Adafruit UF2 bootloader layout): MBR 0x0-0x1000, SoftDevice to 0x26000, app region
-// 0x26000-0xED000, internal LittleFS 0xED000-0xF4000, bootloader 0xF4000+, its settings page at 0xFF000.
+// The application starts after the board's SoftDevice. Internal LittleFS
+// occupies 0xED000-0xF4000; the bootloader starts at 0xF4000.
 // We manage the TOP of the app region: the meta/commit page at 0xEC000 and the staged image right below it,
 // growing downward. Nothing outside [APP_BASE, 0xED000) is ever written except FWUP_BL_SETTINGS (see apply).
-#define FWUP_APP_BASE 0x26000UL
+#define FWUP_APP_BASE OPK_APP_BASE
 #define FWUP_APP_END 0xED000UL
 #define FWUP_META 0xEC000UL
 // internal LittleFS (cfg.bin + bonds.bin) sits between the app region and the bootloader; wiped whole by the
@@ -25,7 +26,7 @@
 // journal end (0x88000) and staging. This keeps both update source and target
 // disjoint from learned RF history.
 #define FWUP_MAX_IMG (RF_CHANNEL_JOURNAL_BASE - FWUP_APP_BASE)
-static_assert(FWUP_MAX_IMG == 0x60000UL,
+static_assert(FWUP_MAX_IMG == 0x86000UL - OPK_APP_BASE,
 	      "RF journal layout changed the WebUSB application cap");
 static_assert(RF_CHANNEL_JOURNAL_END <=
 		      ((FWUP_META - FWUP_MAX_IMG) & ~(FWUP_PAGE - 1UL)),
@@ -139,6 +140,9 @@ uint32_t fwupNextOff(void)
 
 uint8_t fwupBegin(uint32_t size, uint32_t crc32)
 {
+#if !OPK_HAS_STAGED_UPDATE
+	return FWUP_ERR_STATE;
+#endif
 	s_active = false;
 	// any BEGIN first disarms a previously staged update -- a restarted transfer must never leave a stale
 	// commit behind (the staged bytes it points at are about to be overwritten).
@@ -355,6 +359,9 @@ FWUP_RAMFUNC static void ramApply(uint32_t dst, uint32_t src, uint32_t size,
 
 void fwupApplyIfArmed(void)
 {
+#if !OPK_HAS_STAGED_UPDATE
+	return;
+#endif
 	// materialize a reference to the capability tag so the linker's --gc-sections keeps it in the image
 	__asm volatile("" ::"r"(FWUP_TAG));
 	const volatile FwupMeta *m = (const volatile FwupMeta *)FWUP_META;

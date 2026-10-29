@@ -74,6 +74,7 @@ RP_USB_FLAGS = -DNRF52840_XXAA {build.flags.usb} -DCFG_TUD_TASK_QUEUE_SZ=$(CFG_T
 RP_UPLOAD = arduino-cli upload -b $(FQBN) -p "$(FLASH_PORT)" ReversePuckFirmware
 
 .PHONY: format format-check check build build-raytac uf2 package-raytac \
+	build-xiao \
 	flash-raytac deploy-raytac provision-raytac-softdevice build-recovery \
 	reversepuck reversepuck-flash reversepuck-deploy flash deploy
 
@@ -81,6 +82,10 @@ RP_UPLOAD = arduino-cli upload -b $(FQBN) -p "$(FLASH_PORT)" ReversePuckFirmware
 ## EXTRA_FLAGS / FQBN as make variables if needed.
 build:
 	arduino-cli compile -b $(FQBN) $(_PATH_FLAGS) --build-property "build.extra_flags=$(USB_EXTRA_FLAGS)" --build-property "compiler.c.elf.extra_flags=$(OPENPUCK_LINK_FLAGS)" OpenPuck
+
+## Xiao factory S140 7.3.0 build and validated UF2; see docs/XIAO_NRF52840.md.
+build-xiao:
+	python tools/build-xiao.py
 
 ## Build for the Raytac MDBT50Q-CX-40 without replacing its Open DFU bootloader.
 ## Like `build`, this does NOT run gen_version.sh -- run it yourself first if you want version provenance
